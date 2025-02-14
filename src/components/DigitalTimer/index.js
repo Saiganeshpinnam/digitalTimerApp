@@ -4,31 +4,53 @@ import {Component} from 'react'
 import './index.css'
 
 class DigitalTimer extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {date: new Date()}
+  state = {
+    isTimerRunning: false,
+    timeElapsedInSeconds: 0,
+    timerLimitInMinutes: 25,
   }
 
-  componentDidMount() {
-    this.timerId = setInterval(this.tick, 1000)
-  }
+  onStartOrPauseTimer = () => {
+    const {
+      isTimerRunning,
+      timeElapsedInSeconds,
+      timerLimitInMinutes,
+    } = this.state
 
-  tick = () => {
-    this.setState({
-      date: new Date(),
-    })
+    const isTimerCompleted = timeElapsedInSeconds === timerLimitInMinutes * 60
+
+    if (isTimerCompleted) {
+      this.setState({timeElapsedInSeconds: 0})
+    }
+    if (isTimerRunning) {
+      this.clearTimeInterval()
+    } else {
+      this.intervalId = setInterval(this.incrementTimeElapsedInSeconds, 1000)
+    }
+    this.setState(prevState => ({isTimerRunning: !prevState.isTimerRunning}))
   }
 
   render() {
-    const {date} = this.state
+    const {isTimerRunning} = this.state
+
+    const startOrPauseImageUrl = isTimerRunning
+      ? 'https://assets.ccbp.in/frontend/react-js/pause-icon-img.png'
+      : 'https://assets.ccbp.in/frontend/react-js/play-icon-img.png'
+    const startOrPauseAltText = isTimerRunning ? 'pause icon' : 'play icon'
     return (
-      <div className="bg-container">
-        <h1 className="timer-main-heading">Digital Timer</h1>
-        <div className="watch-timer-img">
-          <div className=" timer-container">
-            <p>{date.toLocaleTimeString()}</p>
-          </div>
-        </div>
+      <div>
+        <button type="button" onClick={this.onStartOrPauseTimer}>
+          <img src={startOrPauseImageUrl} alt={startOrPauseAltText} />
+          <p>{isTimerRunning ? 'Pause' : 'Start'}</p>
+        </button>
+
+        <button type="button" onClick={this.onResetTimer}>
+          <img
+            src="https://assets.ccbp.in/frontend/react-js/reset-icon-img.png"
+            alt="reset icon"
+          />
+          <p>Reset</p>
+        </button>
       </div>
     )
   }
