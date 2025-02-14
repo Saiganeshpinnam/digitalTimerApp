@@ -30,15 +30,21 @@ class DigitalTimer extends Component {
     this.setState(prevState => ({isTimerRunning: !prevState.isTimerRunning}))
   }
 
+  incrementTimeElapsedInSeconds = () => {
+    this.setState(prevState => ({
+      timerLimitInMinutes: prevState.timerLimitInMinutes - 1,
+    }))
+  }
+
   render() {
-    const {isTimerRunning} = this.state
+    const {isTimerRunning, timerLimitInMinutes} = this.state
 
     const startOrPauseImageUrl = isTimerRunning
       ? 'https://assets.ccbp.in/frontend/react-js/pause-icon-img.png'
       : 'https://assets.ccbp.in/frontend/react-js/play-icon-img.png'
     const startOrPauseAltText = isTimerRunning ? 'pause icon' : 'play icon'
     return (
-      <div>
+      <div className="bg-container">
         <button type="button" onClick={this.onStartOrPauseTimer}>
           <img src={startOrPauseImageUrl} alt={startOrPauseAltText} />
           <p>{isTimerRunning ? 'Pause' : 'Start'}</p>
@@ -51,6 +57,9 @@ class DigitalTimer extends Component {
           />
           <p>Reset</p>
         </button>
+        <div className="watch-timer-img">
+          <p className="timer-container">{timerLimitInMinutes}</p>
+        </div>
       </div>
     )
   }
