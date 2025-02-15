@@ -40,9 +40,16 @@ class DigitalTimer extends Component {
   }
 
   incrementTimeElapsedInSeconds = () => {
-    this.setState(prevState => ({
-      timerLimitInMinutes: prevState.timerLimitInMinutes - 1,
-    }))
+    this.setState(prevState => {
+      const {timerLimitInMinutes, timeElapsedInSeconds} = prevState
+      const totalRunningTime = timerLimitInMinutes * 60 - timeElapsedInSeconds
+
+      if (totalRunningTime > 0) {
+        return {timeElapsedInSeconds: prevState.timeElapsedInSeconds + 1}
+      }
+      clearInterval(this.intervalId)
+      return {isTimerRunning: false}
+    })
   }
 
   getElapsedSecondsInTimeFormat = () => {
@@ -53,6 +60,19 @@ class DigitalTimer extends Component {
       timeElapsedInSeconds > 9
         ? timeElapsedInSeconds
         : `0${timeElapsedInSeconds}`
+  }
+
+  getFormattedTime = () => {
+    const {timerLimitInMinutes, timeElapsedInSeconds} = this.state
+    const totalRemainingTime = timerLimitInMinutes * 60 - timeElapsedInSeconds
+
+    const minutes = Math.floor(totalRemainingTime / 60)
+    const seconds = totalRemainingTime % 60
+
+    const stringifiedMinutes = minutes > 9 ? minutes : `0${minutes}`
+    const stringifiedSeconds = seconds > 9 ? seconds : `0${seconds}`
+
+    return `${stringifiedMinutes}:${stringifiedSeconds}`
   }
 
   onResetTimer = () => {
@@ -83,36 +103,63 @@ class DigitalTimer extends Component {
       ? 'https://assets.ccbp.in/frontend/react-js/pause-icon-img.png'
       : 'https://assets.ccbp.in/frontend/react-js/play-icon-img.png'
     const startOrPauseAltText = isTimerRunning ? 'pause icon' : 'play icon'
+
     return (
       <div className="bg-container">
         <h1 className="timer-main-heading">Digital Timer</h1>
         <div className="watch-timer-container">
           <div className="watch-timer-img">
-            <p className="timer-container">{timerLimitInMinutes}</p>
+            <p className="timer-container">{this.getFormattedTime()}</p>
           </div>
 
-          <div className="buttons-container">
-            <button type="button" onClick={this.onStartOrPauseTimer}>
-              <img src={startOrPauseImageUrl} alt={startOrPauseAltText} />
-              <p>{isTimerRunning ? 'Pause' : 'Start'}</p>
+          <div className="start-reset-btns-container">
+            <button
+              type="button"
+              onClick={this.onStartOrPauseTimer}
+              className="btn-container"
+            >
+              <img
+                src={startOrPauseImageUrl}
+                alt={startOrPauseAltText}
+                className="start-pause-reset-btn-icons"
+              />
+              <p className="pause-start-text">
+                {isTimerRunning ? 'Pause' : 'Start'}
+              </p>
             </button>
 
-            <button type="button" onClick={this.onResetTimer}>
+            <button
+              type="button"
+              onClick={this.onResetTimer}
+              className="btn-container"
+            >
               <img
                 src="https://assets.ccbp.in/frontend/react-js/reset-icon-img.png"
+                className="start-pause-reset-btn-icons"
                 alt="reset icon"
               />
               <p>Reset</p>
             </button>
           </div>
-          <div>
-            <button onClick={this.onDecreaseTime}>-</button>
+          <p className="set-timer-text">Set Timer Limit</p>
+          <div className="increase-decrease-timer-container">
+            <button
+              onClick={this.onDecreaseTime}
+              className="increase-decrease-btns"
+            >
+              -
+            </button>
             {toIncreaseTime ? (
-              <p>{timerLimitInMinutes} + 1</p>
+              <p className="custom-time">{timerLimitInMinutes} </p>
             ) : (
-              <p>{timerLimitInMinutes} - 1</p>
+              <p className="custom-time">{timerLimitInMinutes} </p>
             )}
-            <button onClick={this.onIncreaseTime}>+</button>
+            <button
+              onClick={this.onIncreaseTime}
+              className="increase-decrease-btns"
+            >
+              +
+            </button>
           </div>
         </div>
       </div>
